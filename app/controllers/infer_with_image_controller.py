@@ -9,9 +9,10 @@ async def infer_with_image_controller(file: File):
     b64_bytes = base64.b64encode(data)
     b64_str = b64_bytes.decode("utf-8")
     content_blocks = [
-        TextContentBlock(type="text", text="Analiza esta imagen y dime qué auto es, marca, modelo, año aproximado, es un auto comprado en Bolivia"),
+        TextContentBlock(type="text", text="Analiza esta imagen y dime qué auto es"),
         ImageContentBlock(type="image", base64=b64_str, mime_type="image/jpeg")
     ]
 
-    return await agent.ainvoke({"messages": [HumanMessage(content=content_blocks)]})
+    result = await agent.ainvoke({"messages": [HumanMessage(content=content_blocks)]})
+    return result["structured_response"]
     # return content_blocks

@@ -24,7 +24,7 @@ async def infer_car_with_image(file: UploadFile = File(...)):
         raise HTTPException(400, "Debe ser una imagen")
     result = await infer_with_image_controller(file)
     
-    return {"message": result.get("messages")[1].content}
+    return {"message": result}
 
 @router.post("/car-with-video")
 async def infer_car_with_video(

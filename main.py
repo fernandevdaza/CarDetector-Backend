@@ -4,10 +4,13 @@ from contextlib import asynccontextmanager
 from app.controllers.yolo_model_controller import init_yolo_model
 import torch, gc
 from app.core.state import state
+from app.core.db import engine
+import app.models.db.models as models
+
+models.Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     state.yolo_model = init_yolo_model()
     yield
     del state.yolo_model
