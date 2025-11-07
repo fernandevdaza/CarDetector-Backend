@@ -36,8 +36,17 @@ async def infer_car_with_image(
     lon: Annotated[Optional[float], Form()] = None,
     source_video_id: Annotated[Optional[str], Form()] = None,
 ):
-    if not (file.content_type or "").startswith("image/"):
-        raise HTTPException(400, "Debe ser una imagen")
+    filename = (file.filename or "").lower()
+    content_type = (file.content_type or "").lower().strip()
+
+    looks_like_image = (
+        content_type.startswith("image/")
+        or filename.endswith(".heic")
+        or filename.endswith(".heif")
+    )
+
+    if not looks_like_image:
+        raise HTTPException(400, "Debe ser una imagen (jpg, png, heic, etc.)")
 
     data = await file.read()
 
@@ -53,17 +62,18 @@ async def infer_car_with_image(
 
     if source_video_id:
         meta["source_video_id"] = source_video_id
+    
+    if (lat and lon) or (meta.get("lat") and meta.get("lon")): 
+        car_model = Cars(
+            brand=result.brand,
+            model_name=result.model_name,
+            year=result.year,
+            lat=lat if lat else meta.get("lat"),
+            lng=lon if lon else meta.get("lon")
+        )
 
-    car_model = Cars(
-        brand=result.brand,
-        model_name=result.model_name,
-        year=result.year,
-        lat=lat if lat else meta.get("lat"),
-        lng=lon if lon else meta.get("lon")
-    )
-
-    db.add(car_model)
-    db.commit()
+        db.add(car_model)
+        db.commit()
 
     return {"message": result, "metadata": meta}
 
