@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routers import inference
+from app.routers import car
 from contextlib import asynccontextmanager
 from app.controllers.yolo_model_controller import init_yolo_model
 import torch, gc
@@ -23,3 +24,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(inference.router)
+app.include_router(car.router)
