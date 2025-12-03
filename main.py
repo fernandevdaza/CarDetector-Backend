@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers import inference
 from app.routers import car
+from app.routers import auth
 from contextlib import asynccontextmanager
 from app.controllers.yolo_model_controller import init_yolo_model
 import torch, gc
@@ -10,6 +11,7 @@ import app.models.db.models as models
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,3 +36,4 @@ app.add_middleware(
 
 app.include_router(inference.router)
 app.include_router(car.router)
+app.include_router(auth.router)
