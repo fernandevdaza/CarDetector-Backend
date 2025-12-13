@@ -57,6 +57,16 @@ def create_access_token(email: str, user_id: int, role: str, expires_delta: time
     return jwt.encode(encode, SECRET_KEY, ALGORITHM)
 
 
+def create_refresh_token(email: str, user_id: int, expires_delta: timedelta = timedelta(days=7)):
+    encode = {
+        "sub": email,
+        "id": user_id,
+    }
+    expires = datetime.now(timezone.utc) + expires_delta
+    encode.update({"exp": expires})
+    return jwt.encode(encode, SECRET_KEY, ALGORITHM)
+
+
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
@@ -85,6 +95,7 @@ class CreateUserRequest(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
     user_id: str
     role: str
@@ -119,8 +130,10 @@ async def login_for_access_token(
         )
 
     token = create_access_token(user.email, user.id, user.role, timedelta(minutes=20))
+    refresh_token = create_refresh_token(user.email, user.id)
     return {
         "access_token": token,
+        "refresh_token": refresh_token,
         "token_type": "bearer",
         "user_id": f"{user.id}",
         "role": user.role,
@@ -158,3 +171,57 @@ async def update_user(
     db.add(user_model)
     db.commit()
     return {"message": "User updated successfully"}
+
+
+@router.post("/refresh", response_model=Token, status_code=status.HTTP_200_OK)
+async def refresh_access_token(refresh_token: str, db: db_dependency):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, ALGORITHM)
+        email = payload.get("sub")
+        user_id = payload.get("id")
+        if email is None or user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate user.",
+            )
+        
+        user = db.query(Users).filter(Users.id == user_id).first()
+        if not user:
+             raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+        
+        new_access_token = create_access_token(user.email, user.id, user.role, timedelta(minutes=20))
+        new_refresh_token = create_refresh_token(user.email, user.id)
+        
+        return {
+            "access_token": new_access_token,
+            "refresh_token": new_refresh_token,
+            "token_type": "bearer",
+            "user_id": f"{user.id}",
+            "role": user.role,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user."
+        )
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user: Annotated[dict, Depends(get_current_user)], db: db_dependency
+):
+    user_model = db.query(Users).filter(Users.id == user.get("id")).first()
+    if not user_model:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+        )
+    
+    db.delete(user_model)
+    db.commit()
+    return
