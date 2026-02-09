@@ -4,7 +4,7 @@ from app.routers import car
 from app.routers import auth
 from contextlib import asynccontextmanager
 # from app.controllers.yolo_model_controller import init_yolo_model
-import torch, gc
+#import torch, gc
 from app.core.state import state
 from app.core.db import engine
 import app.models.db.models as models
