@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Q
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.controllers.infer_with_image_controller import infer_with_image_controller
-from app.controllers.infer_with_video_controller_tracker import infer_with_video_controller_tracker
+# from app.controllers.infer_with_video_controller_tracker import infer_with_video_controller_tracker
 from typing import Annotated, Optional, List, Literal
 import tempfile
 from app.models.db.models import Cars

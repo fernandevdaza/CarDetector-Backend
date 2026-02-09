@@ -1,7 +1,7 @@
-from ultralytics import YOLO
-from typing import Optional
+# from ultralytics import YOLO
+from typing import Optional, Any
 class State():
-    yolo_model: Optional[YOLO]
+    yolo_model: Optional[Any]
 
 
 state = State()

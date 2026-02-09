@@ -3,7 +3,7 @@ from app.routers import inference
 from app.routers import car
 from app.routers import auth
 from contextlib import asynccontextmanager
-from app.controllers.yolo_model_controller import init_yolo_model
+# from app.controllers.yolo_model_controller import init_yolo_model
 import torch, gc
 from app.core.state import state
 from app.core.db import engine
