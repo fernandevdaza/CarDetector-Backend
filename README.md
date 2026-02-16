@@ -237,7 +237,7 @@ This project is maintained by Fernando Daza. All rights reserved.
 ## Author
 
 **Fernando Daza**  
-Email: fernando.daza.18@outlook.com
+https://github.com/fernandevdaza
 
 ## Support
 
