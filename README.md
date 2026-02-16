@@ -230,13 +230,9 @@ Make sure to set up the following environment variables in your `.env` file:
 - `SECRET_KEY`: Secret key for JWT token generation
 - `ALGORITHM`: Algorithm for JWT encoding (e.g., HS256)
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## License
 
-This project is private and maintained by Fernando Daza.
+This project is maintained by Fernando Daza. All rights reserved.
 
 ## Author
 
